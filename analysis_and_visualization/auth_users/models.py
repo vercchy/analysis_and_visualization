@@ -2,6 +2,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
+import csv
 
 
 class CustomUserManager(BaseUserManager):
@@ -49,4 +50,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         return '{} {}'.format(self.first_name, self.last_name)
+
+
+
+
 
