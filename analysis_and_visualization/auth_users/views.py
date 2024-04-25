@@ -1,30 +1,27 @@
-from django.http import JsonResponse
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import AllowAny
+from .serializers import CustomUserSerializer, UserRegistrationSerializer, UserLoginSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 import json
 
 
 # Create your views here.
 
+class UserRegistrationAPIView(GenericAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = UserRegistrationSerializer
 
-@csrf_exempt
-def register(request):
-    if request.method == 'POST':
-        json_data = json.loads(request.body)
-
-        email = json_data.get('email')
-        first_name = json_data.get('first_name')
-        last_name = json_data.get('last_name')
-        password = json_data.get('password')
-        date_of_birth = json_data.get('date_of_birth')
-
-        if not (email and first_name and last_name and password and date_of_birth):
-            return JsonResponse({"error": "All fields are required."}, status=400)
-
-        if User.objects.filter(email=email).exists():
-            return JsonResponse({"errror": "User with this email already exists"}, status=400)
-
-        user = User.objects.create_user(email=email, password=password, first_name=first_name, last_name=last_name,
-                                        date_of_birth=date_of_birth)
-        return JsonResponse({"message": "User registered successfully"}, status=201)
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)  #check whether the data passed from the request is valid
+        user = serializer.save()
+        token = RefreshToken.for_user(user)
+        data = serializer.data
+        data['tokens'] = {
+            'refresh' : str(token),
+            'access' : str(token.access_token)
+        }
+        return Response(data, status=status.HTTP_201_CREATED)
