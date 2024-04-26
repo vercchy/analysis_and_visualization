@@ -19,12 +19,22 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate(self, attrs):
+        print("Validating input data:", attrs)
         if attrs['password1'] != attrs['password2']:
             raise serializers.ValidationError("Passwords do not match")
 
         password = attrs.get('password1')
         if len(password) < 8:
             raise serializers.ValidationError("Password must be at least 8 characters")
+
+        for field_name in ['first_name', 'last_name', 'date_of_birth', 'email', 'password1', 'password2']:
+            if field_name not in attrs:
+                if field_name == 'password1':
+                    raise serializers.ValidationError("Password field is required")
+                elif field_name == 'password2':
+                    raise serializers.ValidationError("Confirm Password field is required")
+                else:
+                    raise serializers.ValidationError("{} field is required".format(field_name))
         return attrs
 
     def create(self, validated_data):
