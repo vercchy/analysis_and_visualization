@@ -44,11 +44,11 @@ class UserLoginAPIView(GenericAPIView):
 
 
 class UserLogoutAPIView(GenericAPIView):
-    permission_classes = (IsAuthenticated,)
+    #permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
         try:
-            refresh_token = request.data['refresh']
+            refresh_token = request.data.get('refresh')
             token = RefreshToken(refresh_token)
             token.blacklist()
             return Response(status=status.HTTP_205_RESET_CONTENT)

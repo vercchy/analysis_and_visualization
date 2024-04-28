@@ -1,11 +1,16 @@
-from django.http import JsonResponse
+from rest_framework import generics
 from .models import UploadedTable
-from django.forms.models import model_to_dict
+from .serializers import UploadedTableSerializer
 
 
-def api_home(request, *args, **kwargs):
-    model_data = UploadedTable.objects.all().order_by("?").first()
-    data = {}
-    if model_data:
-        data = model_to_dict(model_data)
-        return JsonResponse(data)
+class UploadedTableListAPIView(generics.ListAPIView):
+    queryset = UploadedTable.objects.all()
+    serializer_class = UploadedTableSerializer
+
+
+class UploadedTableByUserIdAPIView(generics.ListAPIView):
+    serializer_class = UploadedTableSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id')
+        return UploadedTable.objects.filter(user=user_id)

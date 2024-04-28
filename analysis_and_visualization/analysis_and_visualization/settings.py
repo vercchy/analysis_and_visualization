@@ -73,7 +73,7 @@ CORS_ALLOW_HEADERS = [
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3002',
+    'http://localhost:3000',
 ]
 
 
