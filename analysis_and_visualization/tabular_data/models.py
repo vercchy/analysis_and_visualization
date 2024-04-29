@@ -8,6 +8,7 @@ class UploadedTable(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     csv_content = models.TextField()
+    title = models.CharField(max_length=100)
     uploaded_at = models.DateTimeField(default=timezone.now)
 
     def save_csv_content(self, csv_file):
