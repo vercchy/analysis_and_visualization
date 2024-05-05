@@ -1,3 +1,5 @@
+from io import TextIOWrapper
+
 from django.db import models
 from django.utils import timezone
 import csv
@@ -12,15 +14,12 @@ class UploadedTable(models.Model):
     uploaded_at = models.DateTimeField(default=timezone.now)
 
     def save_csv_content(self, csv_file):
-        csv_data = []
-        reader = csv.DictReader(csv_file)
-        for row in reader:
-            csv_data.append(row)
+        csv_content = csv_file.read().decode('utf-8')
 
-        csv_content = '\n'.join([','.join(row.values()) for row in csv_data])
-
+        # Store the CSV content in the text field
         self.csv_content = csv_content
         self.save()
+
 
         def __str__(self):
             return f"UploadedCSV {self.pk} by {self.user.email}"
