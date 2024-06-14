@@ -1,9 +1,10 @@
 from io import TextIOWrapper
-
+from io import StringIO
 from django.db import models
 from django.utils import timezone
 import csv
 from auth_users.models import User
+from django.template.loader import render_to_string
 
 
 class UploadedTable(models.Model):
@@ -20,6 +21,21 @@ class UploadedTable(models.Model):
         self.csv_content = csv_content
         self.save()
 
-
         def __str__(self):
             return f"UploadedCSV {self.pk} by {self.user.email}"
+
+    def generate_visual_representation(self):
+        import pandas as pd
+        csv_data = pd.read_csv(StringIO(self.csv_content))
+
+        html_table = render_to_string('csv_table.html', {'csv_data' : csv_data.to_html()})
+        print(html_table)
+
+        return html_table
+
+
+
+
+
+
+
